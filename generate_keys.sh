@@ -4,8 +4,8 @@
 create_root_ca()
 {
     echo "Creating root CA..."
-    mkdir -p ${BASE_PATH}/ca/root
-    cd ${BASE_PATH}/ca/root
+    mkdir -p "${BASE_PATH}/ca/root"
+    cd "${BASE_PATH}/ca/root"
     mkdir -p certs crl newcerts private
     chmod 700 private
     touch index.txt
@@ -112,8 +112,8 @@ EOF
 create_intermediate_ca() 
 {
     echo "Creating intermediate CA..."
-    mkdir -p ${BASE_PATH}/ca/intermediate
-    cd ${BASE_PATH}/ca/intermediate
+    mkdir -p "${BASE_PATH}/ca/intermediate"
+    cd "${BASE_PATH}/ca/intermediate"
     mkdir -p certs crl csr newcerts private
     chmod 700 private
     touch index.txt
@@ -227,7 +227,7 @@ EOF
           -out csr/intermediate.csr.pem
 
     echo "Signing intermediate CA CSR with root CA key..."
-    cd ${BASE_PATH}/ca
+    cd "${BASE_PATH}/ca"
     openssl ca \
           -config root/openssl.cnf \
           -extensions v3_intermediate_ca \
@@ -257,7 +257,7 @@ create_server_keypair()
 
     if [ -z "$2" ]
     then
-      echo "No hostname specified"
+      echo "No domainname specified"
       return
     fi
     local domain=$2
@@ -310,7 +310,7 @@ EOF
           -out csr/${cn}.csr.pem
 
     echo "Signing the ${hostname} CSR with intermediate CA key..."
-    cd ${BASE_PATH}
+    cd "${BASE_PATH}"
     openssl ca \
           -config ca/intermediate/openssl.cnf \
           -extensions server_cert \
@@ -342,7 +342,7 @@ create_client_keypair()
 
     if [ -z "$2" ]
     then
-      echo "No hostname specified"
+      echo "No domainname specified"
       return
     fi
     local domain=$2
@@ -395,7 +395,7 @@ EOF
           -out csr/${cn}.csr.pem
 
     echo "Signing the ${hostname} CSR with intermediate CA key..."
-    cd ${BASE_PATH}
+    cd "${BASE_PATH}"
     openssl ca \
           -config ca/intermediate/openssl.cnf \
           -extensions machine_cert \
@@ -429,14 +429,14 @@ create_user_keypair()
 {
     if [ -z "$1" ]
     then
-      echo "No hostname specified"
+      echo "No username specified"
       return
     fi
     local username=$1
 
     if [ -z "$2" ]
     then
-      echo "No hostname specified"
+      echo "No domainname specified"
       return
     fi
     local domain=$2
@@ -493,7 +493,7 @@ EOF
     fi
 
     echo "Signing the ${username} CSR with intermediate CA key..."
-    cd ${BASE_PATH}
+    cd "${BASE_PATH}"
     openssl ca \
           -config ca/intermediate/openssl.cnf \
           -extensions usr_cert \
@@ -540,9 +540,9 @@ then
 	echo "no defaults file found..."
 	exit 127
 fi
-. defaults
+. ./defaults
 
-cd ${BASE_PATH}
+cd "${BASE_PATH}"
 if [ ! \( -f "${BASE_PATH}/ca/root/private/ca.key.pem" -a -f "${BASE_PATH}/ca/root/certs/ca.cert.pem" \) ]
 then
 	create_root_ca
