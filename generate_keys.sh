@@ -329,6 +329,17 @@ EOF
     echo "Verifying DC certificate against intermediate CA certificate"
     openssl x509 -noout -text \
           -in ${hostname}/certs/${cn}.cert.pem
+
+    echo "Creating PKCS#12 distributable key file..."
+    openssl pkcs12 \
+          -export \
+          -chain \
+          -inkey "${hostname}/private/${cn}.key.pem" \
+          -in "${hostname}/certs/${cn}.cert.pem" \
+          -certfile "ca/intermediate/certs/ca-chain.cert.pem" \
+          -CAfile "ca/intermediate/certs/ca-chain.cert.pem" \
+          -out "${hostname}/${cn}.p12" \
+          -passout pass:
 }
 
 create_client_keypair()
@@ -412,17 +423,19 @@ EOF
 
     echo "Creating machine certificate chain..."
     cat ${hostname}/certs/${cn}.cert.pem \
-        ca/intermediate/certs/intermediate.cert.pem > \
+        ca/intermediate/certs/intermediate.cert.pem \
+        ca/root/certs/ca.cert.pem > \
         ${hostname}/certs/${cn}-chain.cert.pem
 
     echo "Creating PKCS#12 distributable key file..."
     openssl pkcs12 \
-          -password pass: \
           -export \
-          -in "${hostname}/certs/${cn}-chain.cert.pem" \
+          -chain \
           -inkey "${hostname}/private/${cn}.key.pem" \
-          -certfile "ca/root/certs/ca.cert.pem" \
-          -out "${hostname}/${cn}.p12"
+          -in "${hostname}/certs/${cn}.cert.pem" \
+          -CAfile "ca/intermediate/certs/ca-chain.cert.pem" \
+          -out "${hostname}/${cn}.p12" \
+          -passout pass:iphone
 }
 
 create_user_keypair()
@@ -523,12 +536,12 @@ EOF
 
     echo "Creating PKCS#12 distributable key file..."
     openssl pkcs12 \
-          -password pass: \
           -export \
           -in "${username}/certs/${username}-chain.cert.pem" \
           -inkey "${username}/private/${username}.key.pem" \
           -certfile "ca/root/certs/ca.cert.pem" \
-          -out "${username}/${username}.p12"
+          -out "${username}/${username}.p12" \
+          -passout pass:
 
     echo "Creating SSH public key..."
     ssh-keygen -f "${username}/private/${username}.key.pem" -y \
