@@ -601,7 +601,7 @@ do
 		create_server_keypair "${SERVER}" "${DOMAIN}"
 	fi
 
-	echo "Verifying ${SERVER} certificate against root CA certificate..."
+	echo "Verifying ${SERVER} server certificate against root CA certificate..."
 	openssl verify -CAfile "${BASE_PATH}/ca/intermediate/certs/ca-chain.cert.pem" "${BASE_PATH}/${SERVER}/certs/${SERVER}.${DOMAIN}.cert.pem"
 	if [ ! $? -eq 0 ]
 	then
@@ -616,7 +616,7 @@ do
                 create_client_keypair "${CLIENT}" "${DOMAIN}"
         fi
 
-        echo "Verifying ${CLIENT} certificate against root CA certificate..."
+        echo "Verifying ${CLIENT} client certificate against root CA certificate..."
         openssl verify -CAfile "${BASE_PATH}/ca/intermediate/certs/ca-chain.cert.pem" "${BASE_PATH}/${CLIENT}/certs/${CLIENT}.${DOMAIN}.cert.pem"
         if [ ! $? -eq 0 ]
         then
@@ -632,7 +632,7 @@ do
                 create_user_keypair "${USER}" "${DOMAIN}"
         fi
 
-        echo "Verifying ${USER} certificate against root CA certificate..."
+        echo "Verifying ${USER} user certificate against root CA certificate..."
         openssl verify -CAfile "${BASE_PATH}/ca/intermediate/certs/ca-chain.cert.pem" "${BASE_PATH}/${USER}/certs/${USER}.cert.pem"
         if [ ! $? -eq 0 ]
         then
