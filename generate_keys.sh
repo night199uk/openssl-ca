@@ -607,6 +607,13 @@ do
 	then
 		create_server_keypair "${SERVER}" "${DOMAIN}"
 	fi
+
+        echo "Testing ${SERVER} server certificate for expiration..."
+        openssl x509 -checkend $(( 86400 * $DAYS )) -in "${BASE_PATH}/${SERVER}/certs/${SERVER}.${DOMAIN}.cert.pem"
+        if [ ! $? -eq 0 ]
+        then
+                create_server_keypair "${SERVER}" "${DOMAIN}"
+        fi
 done
 
 for CLIENT in ${CLIENTS}
@@ -618,10 +625,19 @@ do
 
         echo "Verifying ${CLIENT} client certificate against root CA certificate..."
         openssl verify -CAfile "${BASE_PATH}/ca/intermediate/certs/ca-chain.cert.pem" "${BASE_PATH}/${CLIENT}/certs/${CLIENT}.${DOMAIN}.cert.pem"
+
         if [ ! $? -eq 0 ]
         then
                 create_client_keypair "${CLIENT}" "${DOMAIN}"
         fi
+
+        echo "Testing ${CLIENT} client certificate for expiration..."
+        openssl x509 -checkend $(( 86400 * $DAYS )) -in "${BASE_PATH}/${CLIENT}/certs/${CLIENT}.${DOMAIN}.cert.pem"
+        if [ ! $? -eq 0 ]
+        then
+                create_client_keypair "${CLIENT}" "${DOMAIN}"
+        fi
+
 done
 
 for USER in ${USERS}
@@ -637,5 +653,12 @@ do
         if [ ! $? -eq 0 ]
         then
                 create_user_keypair "${USER}" "${DOMAIN}"
+        fi
+
+        echo "Testing ${USER} client certificate for expiration..."
+        openssl x509 -checkend $(( 86400 * $DAYS )) -in "${BASE_PATH}/${USER}/certs/${USER}.cert.pem"
+        if [ ! $? -eq 0 ]
+        then
+                create_client_keypair "${USER}" "${DOMAIN}"
         fi
 done

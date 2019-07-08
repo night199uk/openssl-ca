@@ -1,3 +1,5 @@
+# Number of days to consider a certificate expired
+DAYS=30
 BASE_PATH="wheretobuild/certificates"
 DOMAIN="yourdomain.com"
 CC="CC"
