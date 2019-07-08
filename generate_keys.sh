@@ -548,13 +548,32 @@ EOF
 	    > "${username}/id_rsa.pub"
 }
 
-if [ ! -f "defaults" ]
+usage() { echo "Usage: $0 [-e <string>]" 1>&2; exit 1; }
+
+while getopts ":e:" o; do
+    case "${o}" in
+        e)
+            environment=${OPTARG}
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+if [ -z "${environment}" ]; then
+  usage
+fi
+
+if [ ! -f "defaults.${environment}" ]
 then
 	echo "no defaults file found..."
 	exit 127
 fi
-. ./defaults
+. "./defaults.${environment}"
 
+mkdir -p "${BASE_PATH}"
 cd "${BASE_PATH}"
 if [ ! \( -f "${BASE_PATH}/ca/root/private/ca.key.pem" -a -f "${BASE_PATH}/ca/root/certs/ca.cert.pem" \) ]
 then
